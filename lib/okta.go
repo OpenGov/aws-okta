@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+        "crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -536,9 +537,15 @@ func (o *OktaClient) Get(method string, path string, data []byte, recv interface
 		}
 	}
 
+        tlsCfg := &tls.Config{
+                NextProtos: []string{"h1"},
+       }
+
 	transCfg := &http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
 		TLSHandshakeTimeout: Timeout,
+                MaxIdleConnsPerHost: -1,
+                TLSClientConfig: tlsCfg,
 	}
 	client = http.Client{
 		Transport: transCfg,
